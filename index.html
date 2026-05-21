@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSpark— Multilingual Learning Platform</title>
+    <meta name="description" content="Learn programming with interactive tutorials, live code execution, and real-time progress tracking.">
+    <!-- Open Graph -->
+    <meta property="og:title" content="CodeSpark">
+    <meta property="og:description" content="Interactive multilingual coding platform with live execution and adaptive quizzes.">
+    <meta property="og:type" content="website">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== AUTH SCREEN (FLIP CARD) ===================== -->
+<div id="login-screen" class="auth-container">
+    <div class="auth-particles" id="auth-particles"></div>
+    <div class="auth-glow"></div>
+
+    <div class="flip-card" id="flip-card">
+        <div class="flip-card-inner" id="flip-card-inner">
+
+            <!-- SIGN IN FACE -->
+            <div class="flip-face flip-front">
+                <div class="auth-brand">
+                    <i class="fa-solid fa-terminal brand-icon"></i>
+                    <span>CodeSpark<span class="accent"></span></span>
+                </div>
+                <p class="auth-sub">Sign in to your sandbox</p>
+
+                <div class="social-row">
+                    <button class="social-btn" onclick="simulateOAuth('GitHub')"><i class="fab fa-github"></i> GitHub</button>
+                    <button class="social-btn" onclick="simulateOAuth('Google')"><i class="fab fa-google"></i> Google</button>
+                    <button class="social-btn" onclick="simulateOAuth('LinkedIn')"><i class="fab fa-linkedin"></i> LinkedIn</button>
+                </div>
+                <div class="divider-row"><span>or use credentials</span></div>
+
+                <form id="login-form">
+                    <div class="field-group">
+                        <i class="fa-regular fa-user field-icon"></i>
+                        <input type="text" id="username" placeholder="Username" required autocomplete="off">
+                    </div>
+                    <div class="field-group">
+                        <i class="fa-solid fa-lock field-icon"></i>
+                        <input type="password" id="password" placeholder="Password" required>
+                    </div>
+                    <div class="remember-row">
+                        <label class="check-label">
+                            <input type="checkbox" id="remember-me"> Remember me
+                        </label>
+                        <a href="#" class="magic-link-btn" onclick="showMagicLinkToast()">Magic Link ✨</a>
+                    </div>
+                    <div id="login-error" class="error-msg"></div>
+                    <button type="submit" class="auth-submit-btn">
+                        Access Dashboard <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+                <p class="auth-switch">No account? <a href="#" onclick="flipCard()">Sign Up →</a></p>
+            </div>
+
+            <!-- SIGN UP FACE -->
+            <div class="flip-face flip-back">
+                <div class="auth-brand">
+                    <i class="fa-solid fa-rocket brand-icon"></i>
+                    <span>Join <span class="accent">CodeSpark</span></span>
+                </div>
+                <p class="auth-sub">Create your free account</p>
+
+                <div class="social-row">
+                    <button class="social-btn" onclick="simulateOAuth('GitHub')"><i class="fab fa-github"></i> GitHub</button>
+                    <button class="social-btn" onclick="simulateOAuth('Google')"><i class="fab fa-google"></i> Google</button>
+                    <button class="social-btn" onclick="simulateOAuth('LinkedIn')"><i class="fab fa-linkedin"></i> LinkedIn</button>
+                </div>
+                <div class="divider-row"><span>or fill in details</span></div>
+
+                <form id="signup-form">
+                    <div class="field-group">
+                        <i class="fa-regular fa-user field-icon"></i>
+                        <input type="text" id="signup-name" placeholder="Full Name" required autocomplete="off">
+                    </div>
+                    <div class="field-group">
+                        <i class="fa-regular fa-envelope field-icon"></i>
+                        <input type="email" id="signup-email" placeholder="Email address" required>
+                    </div>
+                    <div class="field-group">
+                        <i class="fa-solid fa-lock field-icon"></i>
+                        <input type="password" id="signup-pass" placeholder="Create password" required>
+                    </div>
+                    <div id="signup-error" class="error-msg"></div>
+                    <button type="submit" class="auth-submit-btn signup-btn">
+                        Create Account <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                </form>
+                <p class="auth-switch">Have an account? <a href="#" onclick="flipCard()">Sign In →</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== TOAST NOTIFICATION ===================== -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- ===================== MAIN APP WORKSPACE ===================== -->
+<div id="app-workspace" class="workspace hidden">
+
+    <!-- HEADER — Glassmorphism -->
+    <header class="main-header glass-header">
+        <div class="logo" onclick="resetToHubHome()">
+            <i class="fa-solid fa-terminal logo-icon"></i>
+            <h2>CodeSpark<span class="accent-text"></span></h2>
+        </div>
+
+        <div class="track-selector" id="track-selector-nav">
+            <button id="track-popular-btn" class="track-tab active" onclick="switchTrack('popular')">
+                <i class="fa-solid fa-fire"></i> Popular Track
+            </button>
+            <button id="track-programming-btn" class="track-tab" onclick="switchTrack('programming')">
+                <i class="fa-solid fa-book-bookmark"></i> Tutorial Track
+            </button>
+        </div>
+
+        <nav class="nav-links">
+            <!-- Settings Dropdown -->
+            <dropdown class="nav-link">
+                <button class="outline-btn" title="Settings"><i class="fa-solid fa-gear"></i></button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="toggleTheme()"><i class="fas fa-moon"></i> Toggle Theme</a>
+                    <a href="#" onclick="showToast('Font changed to Fira Code!','info')"><i class="fa-solid fa-font"></i> Editor Font</a>
+                    <a href="#" onclick="showToast('Editor theme updated!','info')"><i class="fa-solid fa-palette"></i> Editor Theme</a>
+                    <a href="#" onclick="openAccountSettings()"><i class="fa-solid fa-user-cog"></i> Account Settings</a>
+                </div>
+            </dropdown>
+
+            <button class="outline-btn" onclick="resetToHubHome()" title="Home"><i class="fa-solid fa-house"></i></button>
+            <button class="outline-btn" onclick="openDashboard()" title="Dashboard" id="dashboard-btn">
+                <i class="fa-solid fa-chart-pie"></i>
+            </button>
+
+            <!-- XP Ticker -->
+            <div class="xp-ticker" id="xp-ticker">
+                <i class="fa-solid fa-bolt"></i>
+                <span id="xp-count">0</span> XP
+            </div>
+
+            <!-- Streak -->
+            <div class="streak-badge" id="streak-badge" title="Daily streak">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+                <span id="streak-count">0</span>
+            </div>
+
+            <div class="user-profile">
+                <button id="theme-toggle" class="outline-btn" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <span class="user-badge" id="user-badge-name">
+                    <i class="fa-solid fa-circle-user"></i> <span id="display-username">User</span>
+                </span>
+                <button onclick="logout()" class="btn-logout" title="Sign Out">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ======= DASHBOARD PANEL (Side slide) ======= -->
+    <div id="dashboard-panel" class="dashboard-panel hidden">
+        <div class="dp-header">
+            <h3><i class="fa-solid fa-chart-pie"></i> Progress Dashboard</h3>
+            <button onclick="closeDashboard()" class="dp-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Radial Progress -->
+        <div class="radial-progress-wrap">
+            <svg class="radial-svg" viewBox="0 0 120 120">
+                <circle class="rp-track" cx="60" cy="60" r="50"/>
+                <circle class="rp-fill" id="rp-fill" cx="60" cy="60" r="50" stroke-dasharray="0 314.16"/>
+            </svg>
+            <div class="rp-label">
+                <span id="progress-pct">0%</span>
+                <small>Progress</small>
+            </div>
+        </div>
+
+        <div class="dp-stats">
+            <div class="stat-card">
+                <i class="fa-solid fa-check-circle" style="color:#10b981"></i>
+                <div><strong id="stat-completed">0</strong><small>Completed</small></div>
+            </div>
+            <div class="stat-card">
+                <i class="fa-solid fa-bolt" style="color:#f59e0b"></i>
+                <div><strong id="stat-xp">0</strong><small>Total XP</small></div>
+            </div>
+            <div class="stat-card">
+                <i class="fa-solid fa-fire" style="color:#ef4444"></i>
+                <div><strong id="stat-streak">0</strong><small>Day Streak</small></div>
+            </div>
+            <div class="stat-card">
+                <i class="fa-solid fa-trophy" style="color:#8b5cf6"></i>
+                <div><strong id="stat-quizzes">0</strong><small>Quizzes Passed</small></div>
+            </div>
+        </div>
+
+        <h4 class="dp-section-title">Lesson Progress</h4>
+        <div id="lesson-progress-list" class="lesson-progress-list"></div>
+
+        <h4 class="dp-section-title">Recent Activity</h4>
+        <div id="activity-feed" class="activity-feed"></div>
+    </div>
+
+    <!-- ======= HUB HOME ======= -->
+    <div id="language-hub-home" class="hub-container">
+        <div class="hub-hero">
+            <h1>Code online with <span class="accent-text">CodeSpark</span></h1>
+            <p>16 production runtimes. Interactive tutorials. Adaptive quizzes. Real-time progress.</p>
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="lang-search" placeholder="Search languages (e.g. Python, Rust)..." oninput="filterLanguages()">
+            </div>
+        </div>
+
+        <div class="grid-wrapper" id="lang-grid">
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('python')" data-lang="python">
+                <i class="fa-brands fa-python icon-py"></i>
+                <div class="grid-card-info"><h3>Python</h3><p>Data Science & Scripting</p></div>
+                <div class="card-progress-dot" id="dot-python"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('javascript')" data-lang="javascript">
+                <i class="fa-brands fa-js icon-js"></i>
+                <div class="grid-card-info"><h3>JavaScript</h3><p>Web Clients & Engines</p></div>
+                <div class="card-progress-dot" id="dot-javascript"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('java')" data-lang="java">
+                <i class="fa-brands fa-java icon-java"></i>
+                <div class="grid-card-info"><h3>Java</h3><p>Enterprise Applications</p></div>
+                <div class="card-progress-dot" id="dot-java"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('c')" data-lang="c">
+                <span class="fallback-badge c-badge">C</span>
+                <div class="grid-card-info"><h3>C Language</h3><p>Low-Level Core Systems</p></div>
+                <div class="card-progress-dot" id="dot-c"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('cpp')" data-lang="cpp">
+                <span class="fallback-badge cpp-badge">C++</span>
+                <div class="grid-card-info"><h3>C++</h3><p>High-Performance Engines</p></div>
+                <div class="card-progress-dot" id="dot-cpp"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('html')" data-lang="html">
+                <i class="fa-brands fa-html5 icon-html"></i>
+                <div class="grid-card-info"><h3>HTML5</h3><p>Web Layouts & Structure</p></div>
+                <div class="card-progress-dot" id="dot-html"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('mysql')" data-lang="mysql">
+                <i class="fa-solid fa-database icon-sql"></i>
+                <div class="grid-card-info"><h3>MySQL</h3><p>Relational Data Queries</p></div>
+                <div class="card-progress-dot" id="dot-mysql"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('php')" data-lang="php">
+                <i class="fa-brands fa-php icon-php"></i>
+                <div class="grid-card-info"><h3>PHP</h3><p>Server-Side Rendering</p></div>
+                <div class="card-progress-dot" id="dot-php"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('csharp')" data-lang="csharp">
+                <span class="fallback-badge cs-badge">C#</span>
+                <div class="grid-card-info"><h3>C# .NET</h3><p>Cross-Platform App Layer</p></div>
+                <div class="card-progress-dot" id="dot-csharp"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('typescript')" data-lang="typescript">
+                <span class="fallback-badge ts-badge">TS</span>
+                <div class="grid-card-info"><h3>TypeScript</h3><p>Type-Safe JavaScript</p></div>
+                <div class="card-progress-dot" id="dot-typescript"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('rust')" data-lang="rust">
+                <span class="fallback-badge rust-badge">Rs</span>
+                <div class="grid-card-info"><h3>Rust</h3><p>Memory-Safe Systems</p></div>
+                <div class="card-progress-dot" id="dot-rust"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('lua')" data-lang="lua">
+                <span class="fallback-badge lua-badge">Lua</span>
+                <div class="grid-card-info"><h3>Lua</h3><p>Embedded Game Scripting</p></div>
+                <div class="card-progress-dot" id="dot-lua"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('nodejs')" data-lang="nodejs">
+                <i class="fa-brands fa-node-js icon-node"></i>
+                <div class="grid-card-info"><h3>Node.js</h3><p>V8 Backend Systems</p></div>
+                <div class="card-progress-dot" id="dot-nodejs"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('ruby')" data-lang="ruby">
+                <i class="fa-solid fa-gem icon-ruby"></i>
+                <div class="grid-card-info"><h3>Ruby</h3><p>Elegant Object Frameworks</p></div>
+                <div class="card-progress-dot" id="dot-ruby"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('react')" data-lang="react">
+                <i class="fa-brands fa-react icon-react"></i>
+                <div class="grid-card-info"><h3>React JS</h3><p>Reactive UI Components</p></div>
+                <div class="card-progress-dot" id="dot-react"></div>
+            </div>
+            <div class="lang-grid-card" onclick="launchLanguageSandbox('groovy')" data-lang="groovy">
+                <span class="fallback-badge groovy-badge">Gr</span>
+                <div class="grid-card-info"><h3>Groovy</h3><p>Apache JVM Build</p></div>
+                <div class="card-progress-dot" id="dot-groovy"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= POPULAR TRACK VIEW ======= -->
+    <div id="popular-track-view" class="track-content-layout hidden">
+        <div class="editor-pane">
+            <div class="pane-toolbar">
+                <div class="active-file-title">
+                    <button class="btn-back" onclick="resetToHubHome()"><i class="fa-solid fa-chevron-left"></i> Hub</button>
+                    <span id="pop-filename-label">main.py</span>
+                </div>
+                <button class="btn btn-run" onclick="executeCurrentCode()">
+                    <i class="fa-solid fa-play"></i> Run Code
+                </button>
+            </div>
+            <div id="monaco-popular-container" class="editor-instance"></div>
+        </div>
+        <div class="console-pane">
+            <div class="pane-toolbar">
+                <h3><i class="fa-solid fa-terminal"></i> Console Output</h3>
+                <button class="btn-clear" onclick="clearConsole()"><i class="fa-solid fa-trash-can"></i> Clear</button>
+            </div>
+            <div class="console-body">
+                <div class="stdin-box">
+                    <label><i class="fa-solid fa-keyboard"></i> STDIN Parameters</label>
+                    <textarea id="stdin-popular" placeholder="Enter inputs here..."></textarea>
+                </div>
+                <div class="stdout-box">
+                    <label><i class="fa-solid fa-square-poll-horizontal"></i> Execution Output</label>
+                    <pre id="stdout-popular" class="console-output empty-output">Click "Run Code" to view output.</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======= TUTORIAL / PROGRAMMING TRACK VIEW ======= -->
+    <div id="programming-track-view" class="track-content-layout hidden">
+
+        <!-- Sidebar: Docs + Lesson Navigation + Progress Pulse -->
+        <aside class="docs-sidebar glass-sidebar">
+            <div class="docs-selector-bar">
+                <button class="btn-back btn-full-width" onclick="resetToHubHome()">
+                    <i class="fa-solid fa-chevron-left"></i> Back to Hub
+                </button>
+            </div>
+
+            <!-- Progress Pulse -->
+            <div class="progress-pulse-wrap">
+                <div class="pulse-ring"></div>
+                <svg class="pulse-svg" viewBox="0 0 80 80">
+                    <circle class="pp-track" cx="40" cy="40" r="32"/>
+                    <circle class="pp-fill" id="pp-fill" cx="40" cy="40" r="32" stroke-dasharray="0 201.06"/>
+                </svg>
+                <div class="pp-label">
+                    <span id="lang-progress-pct">0%</span>
+                    <small id="lang-progress-label">Progress</small>
+                </div>
+            </div>
+
+            <!-- Lesson List -->
+            <div class="lesson-nav" id="lesson-nav"></div>
+
+            <!-- Accordion Docs -->
+            <div class="accordion">
+                <div class="accordion-item active">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span><i class="fa-solid fa-circle-info"></i> Language Basics</span>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </div>
+                    <div id="doc-basics" class="accordion-content"></div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span><i class="fa-solid fa-code"></i> Core Syntax</span>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </div>
+                    <div id="doc-syntax" class="accordion-content"></div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span><i class="fa-solid fa-cubes"></i> Patterns</span>
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+                    </div>
+                    <div id="doc-patterns" class="accordion-content"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Editor -->
+        <main class="editor-pane">
+            <div class="pane-toolbar">
+                <div class="current-file-indicator">
+                    <i class="fa-solid fa-file-code"></i>
+                    <span id="prog-filename">main.py</span>
+                    <span class="lesson-chip" id="lesson-chip">Lesson 1</span>
+                </div>
+                <div class="toolbar-right-actions">
+                    <button class="btn btn-mark-complete" id="mark-complete-btn" onclick="markLessonComplete()">
+                        <i class="fa-solid fa-circle-check"></i> Mark Complete
+                    </button>
+                    <button class="btn btn-run" onclick="executeCurrentCode()">
+                        <i class="fa-solid fa-circle-play"></i> Run
+                    </button>
+                </div>
+            </div>
+            <div id="monaco-programming-container" class="editor-instance"></div>
+        </main>
+
+        <!-- Console + Quiz -->
+        <section class="console-pane flex-pane-column">
+            <div class="pane-toolbar">
+                <h3><i class="fa-solid fa-terminal"></i> Build Stream</h3>
+                <div class="console-tabs">
+                    <button class="ctab active" id="ctab-output" onclick="switchConsoleTab('output')">Output</button>
+                    <button class="ctab" id="ctab-quiz" onclick="switchConsoleTab('quiz')">Quiz <span class="quiz-badge" id="quiz-badge"></span></button>
+                </div>
+                <button class="btn-clear" onclick="clearConsole()"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+
+            <!-- Output Tab -->
+            <div id="console-output-tab" class="console-body">
+                <div class="stdin-box shrink-stdin">
+                    <label><i class="fa-solid fa-keyboard"></i> STDIN</label>
+                    <textarea id="stdin-programming" placeholder="Standard arguments..."></textarea>
+                </div>
+                <div class="stdout-box expand-stdout">
+                    <label><i class="fa-solid fa-square-poll-horizontal"></i> Real-time Output</label>
+                    <pre id="stdout-programming" class="console-output empty-output">Awaiting compilation...</pre>
+                </div>
+            </div>
+
+            <!-- Quiz Tab -->
+            <div id="console-quiz-tab" class="quiz-panel hidden">
+                <div id="quiz-container"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer glass-footer">
+        <div class="footer-container">
+            <div class="footer-box">
+                <h2 class="footer-logo">⚡ CodeSpark</h2>
+                <p>Compile, Run & Learn Programming with a modern multi-language editor powered by Judge0 CE API.</p>
+            </div>
+            <div class="footer-box">
+                <h3>Quick Links</h3>
+                <a href="#" onclick="resetToHubHome()">Home</a>
+                <a href="#" onclick="openDashboard()">Dashboard</a>
+                <a href="#">Tutorials</a>
+                <a href="#">Pricing</a>
+            </div>
+            <div class="footer-box">
+                <h3>Tools</h3>
+                <a href="#">Code Formatter</a>
+                <a href="#">Snippet Generator</a>
+                <a href="#" onclick="toggleTheme()">Theme Toggle</a>
+                <a href="#" onclick="openDashboard()">Analytics</a>
+            </div>
+            <div class="footer-box">
+                <h3>Connect</h3>
+                <a href="#"><i class="fab fa-github"></i> GitHub</a>
+                <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-streak">
+                <i class="fa-solid fa-fire-flame-curved"></i>
+                <span id="footer-streak">0-day streak</span> — Keep learning daily!
+            </div>
+            <p>© 2026 CodeSpark Pro. All Rights Reserved. Built with HTML, CSS, JS & Judge0 CE API.</p>
+        </div>
+    </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
