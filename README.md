@@ -5,11 +5,3 @@
 🌐 **Live Demo:** https://codesparrk.vercel.app
 
 
-## 📖 How to Use CodeSpark
-
-1. Open the CodeSpark website.
-2. Register or sign in if required.
-3. Create a learning space or coding workspace.
-4. Write code, develop a website, or explore learning resources.
-5. Use available AI assistance and preview tools to improve your work.
-6. Organize your projects and notes for future use.
