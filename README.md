@@ -5,35 +5,6 @@
 🌐 **Live Demo:** https://codesparrk.vercel.app
 
 
-
-## 🚀 Getting Started
-
-### 1. Visit the Live Website
-
-Open [CodeSpark](https://codesparrk.vercel.app) in your browser to explore the platform.
-
-### 2. Run Locally
-
-To run the project locally, first clone your GitHub repository:
-
-```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-```
-
-Navigate to the project directory:
-
-```bash
-cd YOUR_PROJECT_FOLDER
-```
-
-Install dependencies using the package manager specified by your project, if required, and follow the setup instructions in the source code.
-
-### 3. Configure Environment Variables
-
-If the project uses AI services or external APIs, configure the required environment variables in a local `.env` file.
-
-**Important:** Never commit API keys, passwords, or other secrets to GitHub.
-
 ## 📖 How to Use CodeSpark
 
 1. Open the CodeSpark website.
