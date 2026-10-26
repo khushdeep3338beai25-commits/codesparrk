@@ -13,7 +13,3 @@
 4. Write code, develop a website, or explore learning resources.
 5. Use available AI assistance and preview tools to improve your work.
 6. Organize your projects and notes for future use.
-
-## 🌟 Why CodeSpark?
-
-CodeSpark brings coding practice, website creation, AI-assisted learning, and project organization together in one platform. Its goal is to help learners move beyond theory and develop practical programming skills through experimentation and creativity.
