@@ -6,21 +6,6 @@
 
 
 
-- Make programming easier to learn through practical experience.
-- Provide a unified workspace for coding, website development, and learning.
-- Use AI assistance to support problem-solving and content creation.
-- Encourage creativity, collaboration, and independent learning.
-- Help learners organize their code, notes, and projects efficiently.
-
-## 🛠️ Technologies Used
-
-The exact technology stack should match the implementation in the source repository.
-
-- **Frontend:** Add the frameworks and languages used in your project.
-- **Backend:** Add the backend technology, if applicable.
-- **AI Integration:** Add the AI model or API used, if applicable.
-- **Deployment:** Vercel
-
 ## 🚀 Getting Started
 
 ### 1. Visit the Live Website
